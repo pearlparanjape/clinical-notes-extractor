@@ -1,0 +1,23 @@
+[project]
+name = "clinical-notes"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Anuja P"}
+]
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "flake8 (>=7.3.0,<8.0.0)",
+    "pandas (>=3.0.3,<4.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
