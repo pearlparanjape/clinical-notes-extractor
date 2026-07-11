@@ -1,5 +1,6 @@
 .env
 .venv/
+.vscode/
 data/
 notebooks/
 __pycache__/
