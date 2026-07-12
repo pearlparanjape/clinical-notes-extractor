@@ -11,7 +11,7 @@ Clinical notes are written as free text — abbreviations, narrative prose, valu
 The target categories are:
 
 - **Demographics** — sex, age, weight, height, BMI *(implemented)*
-- **Symptoms** — including negated ("denies chest pain") and implicit findings *(planned)*
+- **Symptoms** — including negated ("denies chest pain") and implicit findings *(implemented)*
 - **Comorbidities** — active, historical, and family history *(planned)*
 - **Medications** — name, dose, route, frequency *(planned)*
 - **Blood tests** — test name, value, unit, timeframe *(planned)*
@@ -162,7 +162,7 @@ Designed for the [`AGBonnet/augmented-clinical-notes`](https://huggingface.co/da
 🚧 *In progress — items are checked off as they land.*
 
 
-- [ ] Additional fields: symptoms (with negation handling), comorbidities, medications, blood tests
+- [X] Additional fields: symptoms (with negation handling), comorbidities, medications, blood tests
 - [ ] Span grounding to catch hallucinated findings
 - [ ] Evaluation against hand-labeled ground truth (precision / recall per field)
 - [ ] Robust batch processing (checkpointing, resume) for the full dataset
