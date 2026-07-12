@@ -15,7 +15,7 @@ class ClaudeClient:
     def complete(self, prompt: str) -> str:
         message = self.client.messages.create(
             model=self.model,
-            max_tokens=500,
+            max_tokens=4000,
             messages=[{"role": "user", "content": prompt}],
         )
         return message.content[0].text

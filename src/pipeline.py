@@ -2,7 +2,7 @@ import pandas as pd
 
 from src import config
 from src.claude_client import ClaudeClient
-from src.extractor import extract_demographics
+from src.extractor import extract_demographics, extract_symptoms
 
 
 def load_notes(n: int) -> pd.DataFrame:
@@ -11,35 +11,58 @@ def load_notes(n: int) -> pd.DataFrame:
     return df.sample(n=n, random_state=config.RANDOM_STATE).reset_index(drop=True)
 
 
-def extract_all(notes: pd.DataFrame, client: ClaudeClient) -> pd.DataFrame:
-    results = []
+def extract_all(notes: pd.DataFrame, client: ClaudeClient):
+    demo_results = []
+    symptom_rows = []
+
     for i, row in notes.iterrows():
-        result = extract_demographics(row[config.NOTE_COLUMN], client)
-        if result["status"] == "ok":
-            results.append(result["data"])
-            print(f"  extracted {i + 1}/{len(notes)}")
+        note_text = row[config.NOTE_COLUMN]
+
+        # --- demographics (one object per note) ---
+        demo = extract_demographics(note_text, client)
+        if demo["status"] == "ok":
+            demo_results.append({"note_id": i, **demo["data"]})
         else:
-            results.append({"error_stage": result["stage"]})
+            demo_results.append({"note_id": i, "error_stage": demo["stage"]})
             print(
-                f"  extracted {i + 1}/{len(notes)}  ⚠️  ERROR "
-                f"({result['stage']}): {result['error']}"
+                f"  note {i}  ⚠️  DEMOGRAPHICS ERROR "
+                f"({demo['stage']}): {demo['error']}"
             )
-            print(f"     raw response: {result['raw'][:200]}")
-    return pd.DataFrame(results)
+
+        # --- symptoms (a list per note) ---
+        symp = extract_symptoms(note_text, client)
+        if symp["status"] == "ok":
+            for s in symp["data"]:
+                symptom_rows.append({"note_id": i, **s})
+        else:
+            symptom_rows.append({"note_id": i, "error_stage": symp["stage"]})
+            print(
+                f"  note {i}  ⚠️  SYMPTOMS ERROR " f"({symp['stage']}): {symp['error']}"
+            )
+
+        print(f"  extracted {i + 1}/{len(notes)}")
+
+    return pd.DataFrame(demo_results), pd.DataFrame(symptom_rows)
 
 
 def main():
-    notes = load_notes(config.N_NOTES)  # config.N_NOTES
+    notes = load_notes(config.N_NOTES)
     client = ClaudeClient()
-    extracted = extract_all(notes, client)
+    demographics, symptoms = extract_all(notes, client)
 
-    notes.to_csv(f"{config.OUTPUT_DIR}/original.csv", index=False)  # config.OUTPUT_DIR
-    extracted.to_csv(f"{config.OUTPUT_DIR}/demographics.csv", index=False)
+    import os
 
-    combined = pd.concat([notes.reset_index(drop=True), extracted], axis=1)
+    os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+
+    notes.to_csv(f"{config.OUTPUT_DIR}/original.csv", index=False)
+    demographics.to_csv(f"{config.OUTPUT_DIR}/demographics.csv", index=False)
+    symptoms.to_csv(f"{config.OUTPUT_DIR}/symptoms.csv", index=False)
+
+    # combined: each symptom row joined to its note's demographics (denormalized view)
+    combined = symptoms.merge(demographics, on="note_id", how="left")
     combined.to_csv(f"{config.OUTPUT_DIR}/combined.csv", index=False)
 
-    print(f"\nDone. Wrote 3 files to {config.OUTPUT_DIR}/")
+    print(f"\nDone. Wrote 4 files to {config.OUTPUT_DIR}/")
 
 
 if __name__ == "__main__":
