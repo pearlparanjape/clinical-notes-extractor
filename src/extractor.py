@@ -110,3 +110,53 @@ def extract_symptoms(note: str, client) -> dict:
             "error": str(e),
             "raw": raw_response,
         }
+
+
+BLOOD_PROMPT_TEMPLATE = """Extract patient blood test information from the
+clinical note below.
+
+Return ONLY a JSON array (a list) of blood test objects. Each object must have:
+- "test_name": the name of the blood test, for example "WBC" or "CRP".
+- "result_type": indicating if the test result is qualitative or quantitative.
+If it is a test which should have a measurable value but only has a categorical result
+(for example a "CRP" test with a low or elevated result),
+this is qualitative with the category as the value.
+ Null if no value.
+- "result": the value of the test result; positive or negative if qualitative,
+and the value with the units if quantitative.
+It may also be low/elevated for a measurable test.
+Null if no value is present.
+
+If there are no blood tests, return an empty list: []
+
+Return nothing but the JSON array — no explanation, no markdown fences.
+
+Clinical note:
+{note}
+"""
+
+
+def extract_blood_tests(note: str, client) -> dict:
+    """Extract a list of blood tests. Returns a structured result dict."""
+    prompt = BLOOD_PROMPT_TEMPLATE.format(note=note)
+    raw_response = client.complete(prompt)
+
+    # clean markdown fences
+    cleaned = raw_response.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned
+        cleaned = cleaned.rsplit("```", 1)[0]
+        cleaned = cleaned.strip()
+
+    # parse JSON
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        return {
+            "status": "error",
+            "stage": "json_parse",
+            "error": str(e),
+            "raw": raw_response,
+        }
+
+    return {"status": "ok", "data": data}
