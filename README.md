@@ -162,10 +162,11 @@ Designed for the [`AGBonnet/augmented-clinical-notes`](https://huggingface.co/da
 🚧 *In progress — items are checked off as they land.*
 
 
-- [X] Additional fields: symptoms (with negation handling),
-- [ ] Additional fields: comorbidities
-- [ ] Additional fields: medications
-- [X] Additional fields: laboratory tests
+### Extraction categories
+- [X] Symptoms (with negation handling)
+- [X] Lab tests (all specimen types, with sample_type)
+- [ ] Comorbidities
+- [ ] Medications
 - [ ] Evaluation against hand-labeled ground truth (precision / recall per field)
 - [ ] Robust batch processing (checkpointing, resume) for the full dataset
 - [ ] Create Streamlit demo
