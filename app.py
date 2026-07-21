@@ -1,7 +1,11 @@
+import os
 import streamlit as st
 import pandas as pd
 from src.claude_client import ClaudeClient
 from src.extractor import extract_demographics, extract_symptoms, extract_blood_tests
+
+if "ANTHROPIC_API_KEY" in st.secrets:
+    os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
 
 st.set_page_config(
     page_title="Clinical Notes Extractor",
