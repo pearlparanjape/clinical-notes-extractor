@@ -7,7 +7,7 @@ from src.extractor import extract_demographics, extract_symptoms, extract_blood_
 
 
 def load_notes(n: int) -> pd.DataFrame:
-    print(f"Loading {n} notes from Hugging Face...")
+    print(f"Loading {n} notes from {config.DATASET}...")
     df = pd.read_json(config.DATASET, lines=True)  # config.DATASET
     return df.sample(n=n, random_state=config.RANDOM_STATE).reset_index(drop=True)
 

@@ -7,7 +7,7 @@ load_dotenv()
 
 class ClaudeClient:
     """The real Claude. Same .complete() interface as FakeClient,
-    so it drops into extract_demographics with no other changes."""
+    but actually calls the Claude API instead of returning canned responses."""
 
     def __init__(self, model: str = config.MODEL):
         self.client = anthropic.Anthropic()

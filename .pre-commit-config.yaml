@@ -11,3 +11,9 @@ repos:
         entry: poetry run flake8 src tests
         language: system
         pass_filenames: false
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+        always_run: true

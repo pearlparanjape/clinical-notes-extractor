@@ -1,6 +1,6 @@
 class FakeClient:
-    """Stand-in for Claude. Returns canned text so we can build and test
-    the whole pipeline with no API cost and identical output every run."""
+    """Stand-in for Claude. Same .complete() interface as ClaudeClient,
+    but returns a canned response instead of calling the API."""
 
     def __init__(self, canned_response: str):
         self.canned_response = canned_response

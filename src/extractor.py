@@ -166,8 +166,6 @@ def extract_blood_tests(note: str, client) -> dict:
             "raw": raw_response,
         }
 
-    return {"status": "ok", "data": data}
-
     # validate — data is a LIST, so validate each item
     try:
         lab_tests = [LabTest(**item) for item in data]
